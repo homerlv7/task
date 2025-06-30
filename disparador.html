@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Disparador Inteligente TASK AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0d1117;
+      --bg-card: #161b22;
+      --border-color: #30363d;
+      --text-color: #e6edf3;
+      --accent: #00ffae;
+      --btn-bg: #00b86b;
+      --btn-hover: #00ffae;
+      --input-bg: #0d1117;
+      --input-border: #2ea043;
+      --placeholder-color: #8b949e;
+      --success-color: #238636;
+      --danger-color: #da3633;
+      --warning-color: #d29922;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 255, 174, 0.07);
+    }
+
+    img {
+      filter: drop-shadow(0px 0px 8px rgba(0, 255, 174, 0.4));
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+    }
+
+    .form-control::placeholder,
+    textarea::placeholder {
+      color: var(--placeholder-color);
+    }
+
+    .form-check-input:checked {
+      background-color: var(--btn-bg);
+      border-color: var(--btn-bg);
+    }
+
+    .form-check-label {
+      color: var(--text-color);
+    }
+
+    .btn-primary {
+      background-color: var(--btn-hover);
+      border-color: var(--btn-hover);
+      transition: all 0.3s ease;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--btn-hover);
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background-color: #6f42c1;
+      border-color: #6f42c1;
+      color: white;
+      font-weight: bold;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5a2d91;
+      filter: brightness(1.1);
+    }
+
+    .btn-success {
+      background-color: var(--btn-bg);
+      border-color: var(--btn-bg);
+      color: white;
+      font-weight: bold;
+    }
+
+    .btn-success:hover {
+      background-color: #00a85f;
+      filter: brightness(1.1);
+    }
+
+    .btn-warning {
+      background-color: var(--warning-color);
+      border-color: var(--warning-color);
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      border-color: var(--danger-color);
+      color: white;
+      font-weight: bold;
+    }
+
+    select.form-select[multiple] {
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--input-border);
+    }
+
+    select.form-select[multiple] option:checked {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    .preview {
+      font-size: 13px;
+      margin-top: 5px;
+      min-height: 24px;
+      color: var(--text-color);
+    }
+
+    .progress {
+      background-color: #30363d;
+      border-radius: 20px;
+      overflow: hidden;
+      height: 25px;
+    }
+
+    .progress-bar {
+      background-color: var(--accent);
+      font-weight: bold;
+      line-height: 25px;
+      color: #000;
+    }
+
+    .grupos-container {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 10px;
+      background-color: var(--input-bg);
+    }
+
+    .grupo-item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s;
+    }
+
+    .grupo-item:hover {
+      background-color: rgba(0, 255, 174, 0.1);
+    }
+
+    .grupo-item:last-child {
+      border-bottom: none;
+    }
+
+    .grupo-checkbox {
+      margin-right: 10px;
+    }
+
+    .grupo-info {
+      flex-grow: 1;
+    }
+
+    .grupo-nome {
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .grupo-jid {
+      font-size: 12px;
+      color: var(--placeholder-color);
+      font-family: monospace;
+    }
+
+    .loading {
+      text-align: center;
+      color: var(--placeholder-color);
+      padding: 20px;
+    }
+
+    .grupos-section {
+      background-color: rgba(0, 255, 174, 0.05);
+      border: 1px solid rgba(0, 255, 174, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .connection-status {
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .status-connected {
+      background-color: rgba(35, 134, 54, 0.1);
+      border: 1px solid var(--success-color);
+      color: var(--success-color);
+    }
+
+    .status-disconnected {
+      background-color: rgba(218, 54, 51, 0.1);
+      border: 1px solid var(--danger-color);
+      color: var(--danger-color);
+    }
+
+    .status-warning {
+      background-color: rgba(210, 153, 34, 0.1);
+      border: 1px solid var(--warning-color);
+      color: var(--warning-color);
+    }
+
+    .config-info {
+      background-color: rgba(0, 255, 174, 0.05);
+      border: 1px solid rgba(0, 255, 174, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      margin-bottom: 15px;
+    }
+
+    .mention-mode-active {
+      background: linear-gradient(45deg, rgba(255, 69, 0, 0.1), rgba(255, 140, 0, 0.1));
+      border: 2px solid #ff4500;
+      animation: pulseOrange 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseOrange {
+      from { box-shadow: 0 0 10px rgba(255, 69, 0, 0.3); }
+      to { box-shadow: 0 0 20px rgba(255, 69, 0, 0.6); }
+    }
+
+    .mention-checkbox {
+      transform: scale(1.2);
+    }
+
+    .mention-checkbox:checked {
+      background-color: #ff4500 !important;
+      border-color: #ff4500 !important;
+    }
+
+    .alert-mention {
+      background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 140, 0, 0.1));
+      border: 2px solid #ff4500;
+      color: #ff4500;
+      font-weight: bold;
+      animation: mentionPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes mentionPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .campos-mensagem {
+      margin-top: 8px;
+    }
+
+    .caption-mensagem {
+      background-color: rgba(0, 255, 174, 0.05);
+      border: 1px dashed var(--input-border);
+    }
+
+    .caption-mensagem::placeholder {
+      color: rgba(0, 255, 174, 0.7);
+      font-style: italic;
+    }
+
+    .participantes-section {
+      background-color: rgba(33, 150, 243, 0.05);
+      border: 1px solid rgba(33, 150, 243, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .participantes-section h5 {
+      color: #2196f3;
+    }
+
+    .btn-info {
+      background-color: #2196f3;
+      border-color: #2196f3;
+      color: white;
+      font-weight: bold;
+    }
+
+    .btn-info:hover {
+      background-color: #1976d2;
+      filter: brightness(1.1);
+    }
+
+    .alert-info {
+      background-color: rgba(33, 150, 243, 0.1);
+      border: 1px solid rgba(33, 150, 243, 0.3);
+      color: #1976d2;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .alert-secondary {
+      background-color: rgba(108, 117, 125, 0.1);
+      border: 1px solid rgba(108, 117, 125, 0.3);
+      color: #6c757d;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .btn-outline-danger {
+      border-color: var(--danger-color);
+      color: var(--danger-color);
+    }
+
+    .btn-outline-danger:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .debug-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      max-width: 400px;
+      background-color: rgba(0, 0, 0, 0.9);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 15px;
+      color: #00ff00;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+    }
+
+    .debug-panel.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="card shadow-lg p-4 mx-auto" style="max-width: 800px;">
+      <div class="text-center mb-4">
+        <img src="https://i.imgur.com/ShEemN5.png" alt="Logo Disparador Inteligente" style="max-width: 100%; height: auto; max-height: 80px;">
+        <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+          <button class="btn btn-outline-light btn-sm" onclick="window.open('conexao.html', '_blank')">🔗 Gerenciar Conexões</button>
+          <button class="btn btn-outline-light btn-sm" id="verificarConexaoBtn">🔍 Verificar Conexão</button>
+          <button class="btn btn-outline-light btn-sm" id="recarregarConfigBtn">🔄 Recarregar Config</button>
+          <button class="btn btn-outline-danger btn-sm" id="debugBtn">🐛 Debug</button>
+        </div>
+      </div>
+
+      <!-- STATUS DA CONEXÃO -->
+      <div id="connectionStatus" class="connection-status status-disconnected">
+        🔄 Verificando conexão...
+      </div>
+
+      <!-- INFORMAÇÕES DA CONFIGURAÇÃO -->
+      <div id="configInfo" class="config-info" style="display: none;">
+        <strong>📡 Configuração Evolution API:</strong><br>
+        <span id="configDetails"></span>
+      </div>
+
+      <!-- ÁREA DE DEBUG RÁPIDO -->
+      <div id="debugQuick" class="alert alert-secondary" style="display: none;">
+        <strong>🐛 Debug Rápido:</strong><br>
+        <div id="debugInfo"></div>
+        <button class="btn btn-sm btn-primary mt-2" onclick="window.open('conexao.html', '_blank')">🔗 Ir para Configuração</button>
+      </div>
+
+      <div class="mb-3">
+        <label for="instancias" class="form-label">Selecione as Instâncias (será aleatório por número)</label>
+        <select class="form-select" id="instancias" multiple>
+          <option value="">Carregando instâncias...</option>
+        </select>
+      </div>
+
+      <!-- SEÇÃO DE BUSCA DE GRUPOS -->
+      <div class="grupos-section">
+        <h5 class="mb-3">🔍 Buscar Grupos do WhatsApp</h5>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="instanciaGrupos" class="form-label">Selecione uma instância para buscar grupos</label>
+            <select class="form-select" id="instanciaGrupos">
+              <option value="">Escolha uma instância...</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-secondary w-100" id="buscarGruposBtn">🔍 Buscar Grupos</button>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-outline-info w-100 btn-sm" id="debugGruposBtn">🔧 Debug Grupos</button>
+          </div>
+        </div>
+
+        <div id="gruposResultado" style="display: none;">
+          <label class="form-label">Grupos encontrados:</label>
+          <div class="grupos-container" id="gruposContainer"></div>
+          
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-success" id="copiarGruposBtn">📋 Copiar Selecionados</button>
+            <button class="btn btn-outline-light btn-sm" id="selecionarTodosBtn">✅ Selecionar Todos</button>
+            <button class="btn btn-outline-light btn-sm" id="limparSelecaoBtn">❌ Limpar Seleção</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="numeros" class="form-label">Números de telefone ou RemoteJIDs (1 por linha)</label>
+        <textarea class="form-control" id="numeros" rows="5" placeholder="Ex: 5599999999999 ou 120363028794527557@g.us"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="arquivoCsv" class="form-label">Ou envie um arquivo CSV (colunas: empresa;telefone)</label>
+        <input type="file" class="form-control" id="arquivoCsv" accept=".csv">
+      </div>
+
+      <div class="row mb-3">
+        <div class="col">
+          <label for="tempoMin" class="form-label">Tempo mínimo (segundos)</label>
+          <input type="number" class="form-control" id="tempoMin" placeholder="Ex: 2" value="2">
+        </div>
+        <div class="col">
+          <label for="tempoMax" class="form-label">Tempo máximo (segundos)</label>
+          <input type="number" class="form-control" id="tempoMax" placeholder="Ex: 5" value="5">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="qtdMensagens" class="form-label">Quantidade de mensagens por número</label>
+        <input type="number" class="form-control" id="qtdMensagens" value="1" min="1">
+      </div>
+
+      <div id="mensagensContainer"></div>
+
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" id="usarIA">
+        <label class="form-check-label" for="usarIA">Usar IA para ajustes automáticos no texto</label>
+      </div>
+
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input mention-checkbox" type="checkbox" id="mencionarTodos">
+        <label class="form-check-label" for="mencionarTodos">
+          <strong>🔥 Mencionar todos os membros do grupo (@everyone)</strong>
+          <small class="d-block text-muted">⚠️ Modo simplificado com mentionsEveryOne - Só aceita grupos</small>
+        </label>
+      </div>
+
+      <div id="alertaMencionar" class="alert alert-mention" style="display: none;">
+        <strong>🔥 MODO "MENCIONAR TODOS" ATIVADO!</strong><br>
+        • Método simplificado: <code>mentionsEveryOne: true</code><br>
+        • Só é possível enviar para <strong>grupos</strong> (@g.us)<br>
+        • Números individuais serão <strong>ignorados</strong><br>
+        • Todos os membros do grupo serão <strong>mencionados automaticamente</strong><br>
+        • Use com responsabilidade para evitar SPAM<br>
+        <button class="btn btn-sm btn-outline-warning mt-2" id="testarMencoesBtn">🧪 Testar Menções</button>
+      </div>
+
+      <!-- NOVA SEÇÃO: EXTRAIR PARTICIPANTES -->
+      <div class="participantes-section mt-4">
+        <h5 class="mb-3">👥 Extrair Participantes dos Grupos</h5>
+        <div class="alert alert-info">
+          <strong>💡 Diferença entre as funcionalidades:</strong><br>
+          • <strong>🔥 Mencionar Todos:</strong> Envia para grupos e menciona todos automaticamente<br>
+          • <strong>👥 Extrair Participantes:</strong> Pega números individuais dos grupos para envio direto
+        </div>
+        <p class="text-muted">Extraia os números dos participantes dos grupos para usar como destinos de disparo</p>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="grupoParaExtrair" class="form-label">Selecione um grupo para extrair participantes</label>
+            <select class="form-select" id="grupoParaExtrair">
+              <option value="">Escolha um grupo...</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-info w-100" id="extrairParticipantesBtn">👥 Extrair Participantes</button>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-outline-success w-100 btn-sm" id="adicionarParticipantesBtn" style="display: none;">📋 Adicionar aos Números</button>
+          </div>
+        </div>
+
+        <div id="participantesResultado" style="display: none;">
+          <label class="form-label">Participantes encontrados:</label>
+          <div class="grupos-container" id="participantesContainer"></div>
+          
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-success" id="copiarParticipantesBtn">📋 Copiar Selecionados</button>
+            <button class="btn btn-outline-light btn-sm" id="selecionarTodosParticipantesBtn">✅ Selecionar Todos</button>
+            <button class="btn btn-outline-light btn-sm" id="limparSelecaoParticipantesBtn">❌ Limpar Seleção</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid mb-4">
+        <button class="btn btn-primary fw-bold" id="dispararBtn">🚀 Disparar</button>
+      </div>
+
+      <div class="progress mb-2" style="display: none;" id="progressBarContainer">
+        <div class="progress-bar" role="progressbar" style="width: 0%;" id="progressBar">0%</div>
+      </div>
+
+      <div id="status" class="text-center fw-bold mt-2"></div>
+    </div>
+  </div>
+
+  <!-- PAINEL DE DEBUG -->
+  <div class="debug-panel" id="debugPanel">
+    <strong>🐛 Debug Panel</strong>
+    <hr>
+    <div id="debugLog"></div>
+  </div>
+
+  <script>
+    // Variáveis globais
+    let evolutionConfig = null;
+    let debugMode = false;
+
+    // Função de debug
+    function debugLog(message, data = null) {
+      console.log(`[DEBUG] ${message}`, data);
+      if (debugMode) {
+        const debugLog = document.getElementById('debugLog');
+        const timestamp = new Date().toLocaleTimeString();
+        debugLog.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        if (data) {
+          debugLog.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+        debugLog.scrollTop = debugLog.scrollHeight;
+      }
+    }
+
+    // Carregar configuração do localStorage
+    function carregarConfiguracaoSalva() {
+      debugLog('Carregando configuração do localStorage...');
+      
+      const saved = localStorage.getItem('evolutionConfig');
+      
+      if (saved) {
+        try {
+          evolutionConfig = JSON.parse(saved);
+          debugLog('Configuração carregada:', evolutionConfig);
+          
+          // Validar se tem os campos necessários
+          if (!evolutionConfig.url || !evolutionConfig.apiKey) {
+            throw new Error('Configuração incompleta');
+          }
+          
+          // Remover barra final da URL se existir
+          evolutionConfig.url = evolutionConfig.url.replace(/\/$/, '');
+          
+          // Mostrar informações da config
+          document.getElementById('configDetails').innerHTML = `
+            URL: ${evolutionConfig.url}<br>
+            API Key: ${evolutionConfig.apiKey.substring(0, 10)}...<br>
+            Instância Padrão: ${evolutionConfig.instance || 'Não definida'}
+          `;
+          document.getElementById('configInfo').style.display = 'block';
+          
+          return evolutionConfig;
+        } catch (error) {
+          debugLog('Erro ao parsear configuração:', error);
+          mostrarStatusConexao('❌ Configuração inválida encontrada', 'disconnected');
+          evolutionConfig = null;
+        }
+      } else {
+        debugLog('Nenhuma configuração encontrada no localStorage');
+        mostrarStatusConexao('⚠️ Nenhuma configuração encontrada. Configure sua conexão primeiro.', 'warning');
+        evolutionConfig = null;
+      }
+      return null;
+    }
+
+    // Verificar conexão com Evolution API
+    async function verificarConexaoEvolution() {
+      debugLog('Verificando conexão com Evolution API...');
+      
+      if (!evolutionConfig) {
+        mostrarStatusConexao('❌ Configuração não carregada', 'disconnected');
+        return false;
+      }
+
+      try {
+        mostrarStatusConexao('🔄 Verificando conexão...', 'warning');
+        
+        const url = `${evolutionConfig.url}/instance/fetchInstances`;
+        debugLog('Fazendo requisição para:', url);
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: { 
+            "apikey": evolutionConfig.apiKey,
+            "Content-Type": "application/json"
+          }
+        });
+
+        debugLog('Status da resposta:', response.status);
+
+        if (response.ok) {
+          const instances = await response.json();
+          debugLog('Instâncias recebidas:', instances);
+          
+          // Filtrar apenas instâncias conectadas
+          const conectadas = instances.filter(i => i.connectionStatus === 'open');
+          mostrarStatusConexao(`✅ Conectado! ${conectadas.length} instância(s) ativa(s)`, 'connected');
+          return true;
+        } else {
+          const errorText = await response.text();
+          debugLog('Erro da API:', errorText);
+          mostrarStatusConexao(`❌ Erro na API: ${response.status}`, 'disconnected');
+          return false;
+        }
+      } catch (error) {
+        debugLog('Erro de conexão:', error);
+        mostrarStatusConexao(`❌ Erro de conexão: ${error.message}`, 'disconnected');
+        return false;
+      }
+    }
+
+    // Mostrar status da conexão
+    function mostrarStatusConexao(message, type) {
+      const statusElement = document.getElementById('connectionStatus');
+      const debugQuick = document.getElementById('debugQuick');
+      const debugInfo = document.getElementById('debugInfo');
+      
+      statusElement.innerHTML = message;
+      statusElement.className = `connection-status status-${type}`;
+      
+      // Mostrar debug se houver problema
+      if (type === 'disconnected' || type === 'warning') {
+        debugInfo.innerHTML = `
+          <small>
+            • Configuração carregada: ${evolutionConfig ? '✅ Sim' : '❌ Não'}<br>
+            ${evolutionConfig ? `• URL: ${evolutionConfig.url}<br>• API Key: ${evolutionConfig.apiKey ? '✅ Definida' : '❌ Não definida'}` : '• Configure sua conexão primeiro'}
+          </small>
+        `;
+        debugQuick.style.display = 'block';
+      } else {
+        debugQuick.style.display = 'none';
+      }
+    }
+
+    // Carregar instâncias
+    async function carregarInstancias() {
+      debugLog('Iniciando carregamento de instâncias...');
+      
+      if (!evolutionConfig) {
+        debugLog('Configuração não encontrada');
+        mostrarStatusConexao('❌ Configure sua conexão primeiro', 'disconnected');
+        return;
+      }
+
+      try {
+        const url = `${evolutionConfig.url}/instance/fetchInstances`;
+        debugLog('Buscando instâncias de:', url);
+        
+        const resposta = await fetch(url, {
+          method: "GET",
+          headers: { 
+            "apikey": evolutionConfig.apiKey,
+            "Content-Type": "application/json"
+          }
+        });
+        
+        debugLog('Status da resposta:', resposta.status);
+        
+        if (!resposta.ok) {
+          const errorText = await resposta.text();
+          throw new Error(`HTTP ${resposta.status}: ${errorText}`);
+        }
+        
+        const data = await resposta.json();
+        debugLog('Dados recebidos:', data);
+        
+        const select = document.getElementById("instancias");
+        const selectGrupos = document.getElementById("instanciaGrupos");
+        
+        // Limpar selects
+        select.innerHTML = '';
+        selectGrupos.innerHTML = '<option value="">Escolha uma instância...</option>';
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Resposta da API não é um array válido');
+        }
+        
+        const abertas = data.filter(i => i.connectionStatus === "open");
+        debugLog('Instâncias abertas:', abertas);
+        
+        if (abertas.length === 0) {
+          mostrarStatusConexao('⚠️ Nenhuma instância conectada encontrada', 'warning');
+          select.innerHTML = '<option value="">Nenhuma instância conectada</option>';
+          return;
+        }
+
+        // Popular os selects
+        abertas.forEach(inst => {
+          // Para o select principal
+          const opt = document.createElement("option");
+          opt.value = inst.name;
+          opt.innerText = `${inst.name} (${inst.owner || 'Conectado'})`;
+          select.appendChild(opt);
+
+          // Para o select de grupos
+          const optGrupos = document.createElement("option");
+          optGrupos.value = inst.name;
+          optGrupos.innerText = inst.name;
+          selectGrupos.appendChild(optGrupos);
+        });
+
+        // Se houver instância padrão, selecionar automaticamente
+        if (evolutionConfig.instance) {
+          const instanciaDefault = abertas.find(inst => inst.name === evolutionConfig.instance);
+          if (instanciaDefault) {
+            select.value = evolutionConfig.instance;
+            document.getElementById('instanciaGrupos').value = evolutionConfig.instance;
+            debugLog('Instância padrão selecionada:', evolutionConfig.instance);
+          }
+        }
+
+        // Atualizar status
+        mostrarStatusConexao(`✅ ${abertas.length} instância(s) conectada(s)`, 'connected');
+
+        // Carregar grupos automaticamente se houver instância
+        if (abertas.length > 0) {
+          setTimeout(async () => {
+            try {
+              const primeiraInstancia = evolutionConfig.instance || abertas[0].name;
+              document.getElementById('instanciaGrupos').value = primeiraInstancia;
+              
+              const gruposParaExtracao = await buscarGruposParaExtracao(primeiraInstancia);
+              if (gruposParaExtracao.length > 0) {
+                popularSelectGrupos(gruposParaExtracao);
+                debugLog('Grupos carregados automaticamente');
+              }
+            } catch (error) {
+              debugLog('Erro ao carregar grupos automaticamente:', error);
+            }
+          }, 1000);
+        }
+
+      } catch (err) {
+        debugLog('Erro ao carregar instâncias:', err);
+        mostrarStatusConexao(`❌ Erro ao carregar instâncias: ${err.message}`, 'disconnected');
+      }
+    }
+
+    // Popular select de grupos para extração
+    function popularSelectGrupos(grupos) {
+      const selectGrupoExtrair = document.getElementById('grupoParaExtrair');
+      selectGrupoExtrair.innerHTML = '<option value="">Escolha um grupo...</option>';
+      
+      grupos.forEach(grupo => {
+        const nomeGrupo = grupo.subject || grupo.name || 'Sem nome';
+        const jidGrupo = grupo.id || grupo.jid || grupo.remoteJid;
+        
+        const option = document.createElement('option');
+        option.value = jidGrupo;
+        option.textContent = `${nomeGrupo} (${jidGrupo.substring(0, 15)}...)`;
+        option.dataset.nomeCompleto = nomeGrupo;
+        selectGrupoExtrair.appendChild(option);
+      });
+    }
+
+    // Buscar grupos apenas para extração (sem mostrar na interface de grupos)
+    async function buscarGruposParaExtracao(instancia) {
+      if (!evolutionConfig) return [];
+
+      try {
+        const url = `${evolutionConfig.url}/group/fetchAllGroups/${instancia}?getParticipants=false`;
+        const resposta = await fetch(url, {
+          method: "GET",
+          headers: { "apikey": evolutionConfig.apiKey }
+        });
+        
+        if (resposta.ok) {
+          const grupos = await resposta.json();
+          return grupos || [];
+        }
+        return [];
+      } catch (error) {
+        debugLog('Erro ao buscar grupos para extração:', error);
+        return [];
+      }
+    }
+
+    // Buscar grupos
+    async function buscarGrupos() {
+      if (!evolutionConfig) {
+        alert('Configure sua conexão Evolution primeiro!');
+        return;
+      }
+
+      const instancia = document.getElementById('instanciaGrupos').value;
+      if (!instancia) {
+        alert('Selecione uma instância primeiro!');
+        return;
+      }
+
+      const container = document.getElementById('gruposContainer');
+      const resultado = document.getElementById('gruposResultado');
+      
+      // Mostrar loading
+      container.innerHTML = '<div class="loading">🔄 Buscando grupos...</div>';
+      resultado.style.display = 'block';
+
+      try {
+        const url = `${evolutionConfig.url}/group/fetchAllGroups/${instancia}?getParticipants=false`;
+        debugLog('Buscando grupos em:', url);
+        
+        const resposta = await fetch(url, {
+          method: "GET",
+          headers: { "apikey": evolutionConfig.apiKey }
+        });
+        
+        if (!resposta.ok) {
+          const errorText = await resposta.text();
+          throw new Error(`HTTP ${resposta.status}: ${errorText}`);
+        }
+        
+        const grupos = await resposta.json();
+        debugLog('Grupos encontrados:', grupos);
+        
+        if (!grupos || grupos.length === 0) {
+          container.innerHTML = '<div class="loading">📭 Nenhum grupo encontrado nesta instância</div>';
+          return;
+        }
+
+        // Renderizar grupos
+        container.innerHTML = '';
+        grupos.forEach((grupo, index) => {
+          const grupoDiv = document.createElement('div');
+          grupoDiv.className = 'grupo-item';
+          
+          const nomeGrupo = grupo.subject || grupo.name || 'Sem nome';
+          const jidGrupo = grupo.id || grupo.jid || grupo.remoteJid;
+          const descricao = grupo.desc || grupo.description || '';
+          const participantes = grupo.participants ? `${grupo.participants.length} participantes` : '';
+          
+          grupoDiv.innerHTML = `
+            <input type="checkbox" class="form-check-input grupo-checkbox" id="grupo_${index}" value="${jidGrupo}">
+            <div class="grupo-info">
+              <div class="grupo-nome">${nomeGrupo}</div>
+              <div class="grupo-jid">${jidGrupo}</div>
+              ${participantes ? `<div class="text-muted" style="font-size: 11px;">${participantes}</div>` : ''}
+              ${descricao ? `<div class="text-muted" style="font-size: 11px;">📝 ${descricao.substring(0, 50)}${descricao.length > 50 ? '...' : ''}</div>` : ''}
+            </div>
+          `;
+          container.appendChild(grupoDiv);
+        });
+
+        container.innerHTML += `<div class="text-success text-center mt-2">✅ ${grupos.length} grupo(s) encontrado(s)</div>`;
+
+        // Popular select de extração de participantes
+        popularSelectGrupos(grupos);
+
+      } catch (error) {
+        debugLog('Erro ao buscar grupos:', error);
+        container.innerHTML = `
+          <div class="alert alert-danger">
+            <strong>❌ Erro ao buscar grupos:</strong><br>
+            ${error.message}<br>
+            <button class="btn btn-sm btn-primary mt-2" onclick="buscarGrupos()">🔄 Tentar Novamente</button>
+          </div>
+        `;
+      }
+    }
+
+    // Extrair participantes de um grupo específico
+    async function extrairParticipantesGrupo() {
+      if (!evolutionConfig) {
+        alert('Configure sua conexão Evolution primeiro!');
+        return;
+      }
+
+      const grupoSelecionado = document.getElementById('grupoParaExtrair').value;
+      if (!grupoSelecionado) {
+        alert('Selecione um grupo primeiro!');
+        return;
+      }
+
+      const instanciaGrupos = document.getElementById('instanciaGrupos').value;
+      if (!instanciaGrupos) {
+        alert('Selecione uma instância primeiro!');
+        return;
+      }
+
+      const container = document.getElementById('participantesContainer');
+      const resultado = document.getElementById('participantesResultado');
+      
+      // Mostrar loading
+      container.innerHTML = '<div class="loading">👥 Extraindo participantes...</div>';
+      resultado.style.display = 'block';
+
+      try {
+        debugLog(`Extraindo participantes do grupo: ${grupoSelecionado}`);
+        
+        const participantes = await buscarParticipantesGrupo(instanciaGrupos, grupoSelecionado);
+        
+        if (!participantes || participantes.length === 0) {
+          container.innerHTML = '<div class="loading">📭 Nenhum participante encontrado neste grupo</div>';
+          return;
+        }
+
+        // Renderizar participantes
+        container.innerHTML = '';
+        participantes.forEach((participante, index) => {
+          const participanteDiv = document.createElement('div');
+          participanteDiv.className = 'grupo-item';
+          
+          // Processar número do participante
+          let numeroLimpo = participante.replace('@s.whatsapp.net', '');
+          let numeroFormatado = numeroLimpo;
+          
+          // Tentar formatar o número se for brasileiro
+          if (numeroLimpo.startsWith('55') && numeroLimpo.length >= 12) {
+            const ddd = numeroLimpo.substring(2, 4);
+            const numero = numeroLimpo.substring(4);
+            numeroFormatado = `+55 (${ddd}) ${numero.substring(0, numero.length-4)}-${numero.substring(numero.length-4)}`;
+          }
+          
+          participanteDiv.innerHTML = `
+            <input type="checkbox" class="form-check-input participante-checkbox" id="participante_${index}" value="${numeroLimpo}">
+            <div class="grupo-info">
+              <div class="grupo-nome">${numeroFormatado}</div>
+              <div class="grupo-jid">${participante}</div>
+            </div>
+          `;
+          container.appendChild(participanteDiv);
+        });
+
+        container.innerHTML += `<div class="text-success text-center mt-2">✅ ${participantes.length} participante(s) extraído(s)</div>`;
+        document.getElementById('adicionarParticipantesBtn').style.display = 'block';
+
+      } catch (error) {
+        debugLog('Erro ao extrair participantes:', error);
+        container.innerHTML = `
+          <div class="alert alert-danger">
+            <strong>❌ Erro ao extrair participantes:</strong><br>
+            ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    // Buscar participantes do grupo
+    async function buscarParticipantesGrupo(instancia, grupoJid) {
+      if (!evolutionConfig) {
+        throw new Error('Configuração Evolution não carregada');
+      }
+
+      try {
+        debugLog(`Buscando participantes do grupo: ${grupoJid}`);
+        
+        // Tentar diferentes endpoints para buscar participantes
+        const endpoints = [
+          `/group/participants/${instancia}?groupJid=${encodeURIComponent(grupoJid)}`,
+          `/group/fetchAllGroups/${instancia}?getParticipants=true`
+        ];
+
+        for (const endpoint of endpoints) {
+          try {
+            debugLog(`Tentando endpoint: ${endpoint}`);
+            const response = await fetch(`${evolutionConfig.url}${endpoint}`, {
+              headers: { 'apikey': evolutionConfig.apiKey }
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              debugLog(`Resposta do endpoint:`, result);
+              
+              let participantes = [];
+              
+              // Se for o endpoint fetchAllGroups, procurar o grupo específico
+              if (endpoint.includes('fetchAllGroups')) {
+                if (Array.isArray(result)) {
+                  const grupo = result.find(g => g.id === grupoJid);
+                  if (grupo && grupo.participants) {
+                    participantes = grupo.participants;
+                  }
+                }
+              } else {
+                // Para endpoints específicos de participantes
+                if (Array.isArray(result)) {
+                  participantes = result;
+                } else if (result.participants) {
+                  participantes = result.participants;
+                }
+              }
+              
+              // Processar participantes para extrair IDs corretos
+              if (participantes && participantes.length > 0) {
+                const ids = participantes.map(p => {
+                  let id = p.id || p.jid || p.participant || p;
+                  
+                  // Garantir que tenha @s.whatsapp.net se for número
+                  if (typeof id === 'string') {
+                    if (!id.includes('@') && id.match(/^\d+$/)) {
+                      id = id + '@s.whatsapp.net';
+                    }
+                  }
+                  
+                  return id;
+                }).filter(id => id && typeof id === 'string');
+                
+                debugLog(`${ids.length} participantes encontrados`);
+                return ids;
+              }
+            }
+          } catch (endpointError) {
+            debugLog(`Endpoint ${endpoint} falhou:`, endpointError);
+            continue;
+          }
+        }
+
+        return [];
+        
+      } catch (error) {
+        debugLog('Erro ao buscar participantes:', error);
+        return [];
+      }
+    }
+
+    // Copiar grupos selecionados
+    function copiarGruposSelecionados() {
+      const checkboxes = document.querySelectorAll('.grupo-checkbox:checked');
+      if (checkboxes.length === 0) {
+        alert('Selecione pelo menos um grupo!');
+        return;
+      }
+
+      const jids = Array.from(checkboxes).map(cb => cb.value);
+      const textareaNumeros = document.getElementById('numeros');
+      
+      // Adicionar aos números existentes ou substituir
+      const numerosExistentes = textareaNumeros.value.trim();
+      if (numerosExistentes) {
+        textareaNumeros.value = numerosExistentes + '\n' + jids.join('\n');
+      } else {
+        textareaNumeros.value = jids.join('\n');
+      }
+
+      alert(`${jids.length} grupo(s) adicionado(s) à lista de números!`);
+    }
+
+    // Copiar participantes selecionados
+    function copiarParticipantesSelecionados() {
+      const checkboxes = document.querySelectorAll('.participante-checkbox:checked');
+      if (checkboxes.length === 0) {
+        alert('Selecione pelo menos um participante!');
+        return;
+      }
+
+      const numeros = Array.from(checkboxes).map(cb => cb.value);
+      const textareaNumeros = document.getElementById('numeros');
+      
+      // Adicionar aos números existentes ou substituir
+      const numerosExistentes = textareaNumeros.value.trim();
+      if (numerosExistentes) {
+        textareaNumeros.value = numerosExistentes + '\n' + numeros.join('\n');
+      } else {
+        textareaNumeros.value = numeros.join('\n');
+      }
+
+      alert(`${numeros.length} participante(s) adicionado(s) à lista de números!`);
+    }
+
+    // Selecionar todos os grupos
+    function selecionarTodosGrupos() {
+      const checkboxes = document.querySelectorAll('.grupo-checkbox');
+      checkboxes.forEach(cb => cb.checked = true);
+    }
+
+    // Limpar seleção
+    function limparSelecaoGrupos() {
+      const checkboxes = document.querySelectorAll('.grupo-checkbox');
+      checkboxes.forEach(cb => cb.checked = false);
+    }
+
+    // Selecionar todos os participantes
+    function selecionarTodosParticipantes() {
+      const checkboxes = document.querySelectorAll('.participante-checkbox');
+      checkboxes.forEach(cb => cb.checked = true);
+    }
+
+    // Limpar seleção de participantes
+    function limparSelecaoParticipantes() {
+      const checkboxes = document.querySelectorAll('.participante-checkbox');
+      checkboxes.forEach(cb => cb.checked = false);
+    }
+
+    // Enviar mensagem via Evolution API
+    async function enviarMensagem(instancia, numero, mensagem, mencionarTodos = false) {
+      if (!evolutionConfig) {
+        throw new Error('Configuração Evolution não carregada');
+      }
+
+      // Detectar se é grupo ou número individual
+      const isGroup = numero.includes('@g.us');
+      const cleanNumber = numero.replace(/\D/g, '');
+      
+      let payload;
+      let endpoint;
+
+      if (mensagem.tipo === 'texto') {
+        endpoint = `${evolutionConfig.url}/message/sendText/${instancia}`;
+        
+        payload = {
+          number: isGroup ? numero : cleanNumber,
+          text: mensagem.conteudo
+        };
+        
+        // Se é para mencionar todos e é um grupo, usar mentionsEveryOne
+        if (mencionarTodos && isGroup) {
+          payload.mentionsEveryOne = true;
+        }
+        
+      } else if (mensagem.tipo === 'imagem') {
+        endpoint = `${evolutionConfig.url}/message/sendMedia/${instancia}`;
+        
+        payload = {
+          number: isGroup ? numero : cleanNumber,
+          mediatype: 'image',
+          media: mensagem.conteudo,
+          caption: mensagem.caption || 'Imagem enviada pelo Disparador TASK AI'
+        };
+        
+        // Adicionar menções para mídia também
+        if (mencionarTodos && isGroup) {
+          payload.mentionsEveryOne = true;
+        }
+        
+      } else if (mensagem.tipo === 'audio') {
+        endpoint = `${evolutionConfig.url}/message/sendMedia/${instancia}`;
+        payload = {
+          number: isGroup ? numero : cleanNumber,
+          mediatype: 'audio',
+          media: mensagem.conteudo
+        };
+        
+        // Áudio não suporta caption, mas ainda pode ter menções
+        if (mencionarTodos && isGroup) {
+          payload.mentionsEveryOne = true;
+        }
+        
+      } else if (mensagem.tipo === 'video') {
+        endpoint = `${evolutionConfig.url}/message/sendMedia/${instancia}`;
+        
+        payload = {
+          number: isGroup ? numero : cleanNumber,
+          mediatype: 'video',
+          media: mensagem.conteudo,
+          caption: mensagem.caption || 'Vídeo enviado pelo Disparador TASK AI'
+        };
+        
+        // Adicionar menções para vídeo também
+        if (mencionarTodos && isGroup) {
+          payload.mentionsEveryOne = true;
+        }
+      }
+
+      debugLog('Enviando mensagem:', { endpoint, payload });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': evolutionConfig.apiKey
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      return await response.json();
+    }
+
+    // Event listeners
+    document.getElementById('verificarConexaoBtn').addEventListener('click', async () => {
+      await verificarConexaoEvolution();
+      if (evolutionConfig) {
+        await carregarInstancias();
+      }
+    });
+
+    document.getElementById('recarregarConfigBtn').addEventListener('click', async () => {
+      debugLog('Recarregando configuração...');
+      carregarConfiguracaoSalva();
+      if (evolutionConfig) {
+        await verificarConexaoEvolution();
+        await carregarInstancias();
+      }
+    });
+
+    // Debug button
+    document.getElementById('debugBtn').addEventListener('click', () => {
+      debugMode = !debugMode;
+      const debugPanel = document.getElementById('debugPanel');
+      debugPanel.classList.toggle('show');
+      
+      if (debugMode) {
+        debugLog('Debug mode ativado');
+        debugLog('Configuração atual:', evolutionConfig);
+      }
+    });
+
+    // Event listeners para grupos
+    document.getElementById('buscarGruposBtn').addEventListener('click', buscarGrupos);
+    document.getElementById('copiarGruposBtn').addEventListener('click', copiarGruposSelecionados);
+    document.getElementById('selecionarTodosBtn').addEventListener('click', selecionarTodosGrupos);
+    document.getElementById('limparSelecaoBtn').addEventListener('click', limparSelecaoGrupos);
+    
+    // Event listeners para participantes
+    document.getElementById('extrairParticipantesBtn').addEventListener('click', extrairParticipantesGrupo);
+    document.getElementById('adicionarParticipantesBtn').addEventListener('click', copiarParticipantesSelecionados);
+    document.getElementById('copiarParticipantesBtn').addEventListener('click', copiarParticipantesSelecionados);
+    document.getElementById('selecionarTodosParticipantesBtn').addEventListener('click', selecionarTodosParticipantes);
+    document.getElementById('limparSelecaoParticipantesBtn').addEventListener('click', limparSelecaoParticipantes);
+
+    // Debug grupos
+    document.getElementById('debugGruposBtn').addEventListener('click', async () => {
+      const instancia = document.getElementById('instanciaGrupos').value;
+      if (!instancia) {
+        alert('Selecione uma instância primeiro!');
+        return;
+      }
+      
+      debugLog('Testando endpoints de grupos para instância:', instancia);
+      
+      const endpoints = [
+        `/group/fetchAllGroups/${instancia}?getParticipants=false`,
+        `/group/fetchAllGroups/${instancia}?getParticipants=true`,
+        `/groups/${instancia}`,
+        `/instance/groups/${instancia}`
+      ];
+      
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(`${evolutionConfig.url}${endpoint}`, {
+            headers: { 'apikey': evolutionConfig.apiKey }
+          });
+          debugLog(`${endpoint}: ${response.status} ${response.statusText}`);
+        } catch (error) {
+          debugLog(`${endpoint}: ERRO - ${error.message}`);
+        }
+      }
+    });
+
+    // Leitura de CSV
+    document.getElementById('arquivoCsv').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const csvContent = event.target.result;
+        const linhas = csvContent.split('\n').map(l => l.trim()).filter(l => l);
+
+        const telefones = [];
+        for (let i = 0; i < linhas.length; i++) {
+          const partes = linhas[i].split(';');
+          if (i === 0 && (partes[0].toLowerCase().includes('empresa') || partes[1].toLowerCase().includes('telefone'))) {
+            continue; // pula cabeçalho
+          }
+          if (partes.length > 1) {
+            telefones.push(partes[1].trim());
+          }
+        }
+
+        document.getElementById('numeros').value = telefones.join('\n');
+      };
+      reader.readAsText(file);
+    });
+
+    // Campos dinâmicos de mensagens
+    const container = document.getElementById('mensagensContainer');
+    const qtdMensagensInput = document.getElementById('qtdMensagens');
+    
+    function criarCaixinhasMensagem(qtd) {
+      container.innerHTML = '';
+      for (let i = 0; i < qtd; i++) {
+        const div = document.createElement('div');
+        div.classList.add('mb-3');
+        div.innerHTML = `
+          <label class="form-label">Mensagem ${i + 1}</label>
+          <select class="form-select tipo-mensagem mb-2" data-index="${i}">
+            <option value="texto">Texto</option>
+            <option value="imagem">Imagem</option>
+            <option value="audio">Áudio</option>
+            <option value="video">Vídeo</option>
+          </select>
+          <div class="campos-mensagem">
+            <input type="text" class="form-control conteudo-mensagem" placeholder="Digite o texto da mensagem">
+          </div>
+          <div class="preview text-white"></div>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    // Atualizar campos baseado no tipo de mensagem
+    function atualizarCamposMensagem(index) {
+      const tipoSelect = document.querySelectorAll('.tipo-mensagem')[index];
+      const camposDiv = document.querySelectorAll('.campos-mensagem')[index];
+      const tipo = tipoSelect.value;
+      
+      if (tipo === 'texto') {
+        camposDiv.innerHTML = `
+          <input type="text" class="form-control conteudo-mensagem" placeholder="Digite o texto da mensagem">
+        `;
+      } else if (tipo === 'imagem') {
+        camposDiv.innerHTML = `
+          <input type="url" class="form-control conteudo-mensagem mb-2" placeholder="URL da imagem (ex: https://exemplo.com/imagem.jpg)">
+          <input type="text" class="form-control caption-mensagem" placeholder="Legenda da imagem (opcional)">
+        `;
+      } else if (tipo === 'video') {
+        camposDiv.innerHTML = `
+          <input type="url" class="form-control conteudo-mensagem mb-2" placeholder="URL do vídeo (ex: https://exemplo.com/video.mp4)">
+          <input type="text" class="form-control caption-mensagem" placeholder="Legenda do vídeo (opcional)">
+        `;
+      } else if (tipo === 'audio') {
+        camposDiv.innerHTML = `
+          <input type="url" class="form-control conteudo-mensagem" placeholder="URL do áudio (ex: https://exemplo.com/audio.mp3)">
+        `;
+      }
+      
+      // Trigger para atualizar preview
+      setTimeout(() => {
+        container.dispatchEvent(new Event('input', { bubbles: true }));
+      }, 100);
+    }
+
+    qtdMensagensInput.addEventListener('change', () => {
+      const qtd = parseInt(qtdMensagensInput.value);
+      if (qtd > 0) {
+        criarCaixinhasMensagem(qtd);
+      }
+    });
+
+    criarCaixinhasMensagem(parseInt(qtdMensagensInput.value));
+
+    // Event listener para input changes
+    container.addEventListener('input', () => {
+      const allPreviews = document.querySelectorAll('.preview');
+      const allInputs = document.querySelectorAll('.conteudo-mensagem');
+      const allCaptions = document.querySelectorAll('.caption-mensagem');
+      const allTipos = document.querySelectorAll('.tipo-mensagem');
+      const mencionarTodos = document.getElementById('mencionarTodos').checked;
+
+      allInputs.forEach((input, i) => {
+        const preview = allPreviews[i];
+        const tipo = allTipos[i]?.value || 'texto';
+        const conteudo = input.value.trim();
+        const caption = allCaptions[i]?.value.trim() || '';
+
+        if (!conteudo) {
+          preview.innerHTML = '';
+          return;
+        }
+
+        if (tipo === 'texto') {
+          let previewContent = `<div class="mt-2 p-2 bg-dark rounded border" style="font-size: 14px;">${conteudo}</div>`;
+          
+          if (mencionarTodos) {
+            previewContent += `<div class="mt-1 text-warning" style="font-size: 12px;">🔥 + Menções para todos</div>`;
+          }
+          
+          preview.innerHTML = previewContent;
+        } else if (tipo === 'imagem') {
+          let previewContent = /\.(jpg|jpeg|png|gif|webp)$/i.test(conteudo)
+            ? `<img src="${conteudo}" alt="preview imagem" style="max-width: 100%; max-height: 250px; margin-top: 10px; border-radius: 8px; object-fit: contain;">${caption ? `<div class="mt-1" style="font-size: 12px;">${caption}</div>` : ''}`
+            : `<div class="text-warning mt-2">⚠️ Link de imagem inválido</div>`;
+            
+          if (mencionarTodos && /\.(jpg|jpeg|png|gif|webp)$/i.test(conteudo)) {
+            previewContent += `<div class="mt-1 text-warning" style="font-size: 12px;">🔥 + Menções para todos</div>`;
+          }
+          
+          preview.innerHTML = previewContent;
+        } else if (tipo === 'audio') {
+          let previewContent = /\.(mp3|ogg|wav)$/i.test(conteudo)
+            ? `<audio controls style="margin-top: 10px; width: 100%;"><source src="${conteudo}"></audio>`
+            : `<div class="text-warning mt-2">⚠️ Link de áudio inválido</div>`;
+            
+          if (mencionarTodos && /\.(mp3|ogg|wav)$/i.test(conteudo)) {
+            previewContent += `<div class="mt-1 text-warning" style="font-size: 12px;">🔥 + Menções para todos</div>`;
+          }
+          
+          preview.innerHTML = previewContent;
+        } else if (tipo === 'video') {
+          let previewContent = /\.(mp4|webm|mov|m4v)$/i.test(conteudo)
+            ? `<video controls style="margin-top: 10px; width: 100%; max-height: 250px; border-radius: 8px; object-fit: contain;"><source src="${conteudo}" type="video/mp4"></video>${caption ? `<div class="mt-1" style="font-size: 12px;">${caption}</div>` : ''}`
+            : `<div class="text-warning mt-2">⚠️ Link de vídeo inválido</div>`;
+            
+          if (mencionarTodos && /\.(mp4|webm|mov|m4v)$/i.test(conteudo)) {
+            previewContent += `<div class="mt-1 text-warning" style="font-size: 12px;">🔥 + Menções para todos</div>`;
+          }
+          
+          preview.innerHTML = previewContent;
+        }
+      });
+    });
+
+    // Event listener para mudanças de tipo (select)
+    container.addEventListener('change', (e) => {
+      if (e.target.classList.contains('tipo-mensagem')) {
+        const index = parseInt(e.target.dataset.index);
+        atualizarCamposMensagem(index);
+      }
+    });
+
+    // Controle do modo "Mencionar Todos"
+    document.getElementById('mencionarTodos').addEventListener('change', function() {
+      const alertaMencionar = document.getElementById('alertaMencionar');
+      const numerosTextarea = document.getElementById('numeros');
+      const cardPrincipal = document.querySelector('.card');
+      
+      if (this.checked) {
+        // Ativar modo visual
+        alertaMencionar.style.display = 'block';
+        cardPrincipal.classList.add('mention-mode-active');
+        
+        // Adicionar aviso no placeholder
+        numerosTextarea.placeholder = '🔥 MODO MENCIONAR TODOS: Só adicione grupos (@g.us) - Ex: 120363028794527557@g.us';
+        
+        // Filtrar apenas grupos dos números existentes
+        const numerosAtuais = numerosTextarea.value.split('\n').filter(n => n.trim());
+        const apenasGrupos = numerosAtuais.filter(numero => numero.includes('@g.us'));
+        
+        if (apenasGrupos.length !== numerosAtuais.length && numerosAtuais.length > 0) {
+          const numerosIndividuais = numerosAtuais.filter(numero => !numero.includes('@g.us'));
+          if (confirm(`🚨 Modo "Mencionar Todos" ativado!\n\n${numerosIndividuais.length} número(s) individual(is) será(ão) removido(s):\n${numerosIndividuais.join('\n')}\n\nContinuar?`)) {
+            numerosTextarea.value = apenasGrupos.join('\n');
+          } else {
+            this.checked = false;
+            alertaMencionar.style.display = 'none';
+            cardPrincipal.classList.remove('mention-mode-active');
+            return;
+          }
+        }
+      } else {
+        // Desativar modo visual
+        alertaMencionar.style.display = 'none';
+        cardPrincipal.classList.remove('mention-mode-active');
+        numerosTextarea.placeholder = 'Ex: 5599999999999 ou 120363028794527557@g.us';
+      }
+      
+      // Atualizar previews das mensagens
+      container.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // Função para testar menções
+    document.getElementById('testarMencoesBtn').addEventListener('click', async () => {
+      alert('🧪 Teste de Menções\n\nPara testar:\n1. Adicione um grupo pequeno nos números\n2. Configure uma mensagem simples\n3. Execute o disparo\n\nO sistema irá mencionar todos automaticamente!');
+    });
+
+    // Funções auxiliares para disparo
+    function gerarDelayAleatorio(min, max) {
+      min = parseInt(min);
+      max = parseInt(max);
+      return (Math.floor(Math.random() * (max - min + 1)) + min) * 1000;
+    }
+
+    function sortearInstancia(lista) {
+      const index = Math.floor(Math.random() * lista.length);
+      return lista[index];
+    }
+
+    // Disparo final
+    document.getElementById('dispararBtn').addEventListener('click', async () => {
+      if (!evolutionConfig) {
+        alert('Configure sua conexão Evolution primeiro!');
+        return;
+      }
+
+      const numeros = document.getElementById('numeros').value.trim().split('\n').filter(n => n);
+      const tempoMin = document.getElementById('tempoMin').value;
+      const tempoMax = document.getElementById('tempoMax').value;
+      const usarIA = document.getElementById('usarIA').checked;
+      const mencionarTodos = document.getElementById('mencionarTodos').checked;
+      const tipos = document.querySelectorAll('.tipo-mensagem');
+      const conteudos = document.querySelectorAll('.conteudo-mensagem');
+      const captions = document.querySelectorAll('.caption-mensagem');
+      const instanciasSelect = document.getElementById('instancias');
+      const instanciasSelecionadas = Array.from(instanciasSelect.selectedOptions).map(opt => opt.value);
+
+      if (!numeros.length || !tempoMin || !tempoMax || instanciasSelecionadas.length === 0) {
+        alert('Preencha todos os campos e selecione pelo menos uma instância.');
+        return;
+      }
+
+      // Validação especial para modo "Mencionar Todos"
+      if (mencionarTodos) {
+        const numerosIndividuais = numeros.filter(numero => !numero.includes('@g.us'));
+        
+        if (numerosIndividuais.length > 0) {
+          alert(`🚨 Modo "Mencionar Todos" ativado!\n\nApenas grupos (@g.us) são permitidos.\n\nNúmeros individuais encontrados:\n${numerosIndividuais.join('\n')}\n\nRemova-os ou desative o modo "Mencionar Todos".`);
+          return;
+        }
+        
+        if (numeros.length === 0) {
+          alert('🚨 Nenhum grupo encontrado!\n\nAdicione grupos (@g.us) ou use a função "Buscar Grupos".');
+          return;
+        }
+        
+        // Confirmação especial para mencionar todos
+        const confirmacao = confirm(`🔥 ATENÇÃO: Modo "Mencionar Todos" ativado!\n\n• ${numeros.length} grupo(s) será(ão) afetado(s)\n• TODOS os membros de cada grupo serão mencionados\n• Isso pode ser considerado SPAM\n\nTem certeza que deseja continuar?`);
+        
+        if (!confirmacao) {
+          return;
+        }
+      }
+
+      const mensagens = Array.from(tipos).map((tipo, i) => ({
+        tipo: tipo.value,
+        conteudo: conteudos[i].value.trim(),
+        caption: captions[i] ? captions[i].value.trim() : ''
+      }));
+
+      // Validar mensagens
+      const mensagensValidas = mensagens.filter(m => m.conteudo);
+      if (mensagensValidas.length === 0) {
+        alert('Digite pelo menos uma mensagem!');
+        return;
+      }
+
+      const total = numeros.length * mensagensValidas.length;
+      const progressBar = document.getElementById('progressBar');
+      const progressContainer = document.getElementById('progressBarContainer');
+      const status = document.getElementById('status');
+
+      progressContainer.style.display = 'block';
+      let log = '';
+      let contador = 0;
+      let sucessos = 0;
+      let erros = 0;
+
+      // Adicionar informações do modo no log
+      log += `🚀 DISPARADOR TASK AI - ${new Date().toLocaleString()}\n`;
+      log += `📊 Total de destinos: ${numeros.length}\n`;
+      log += `📝 Total de mensagens: ${mensagensValidas.length}\n`;
+      log += `🔥 Mencionar todos: ${mencionarTodos ? 'SIM' : 'NÃO'}\n`;
+      log += `🤖 Usar IA: ${usarIA ? 'SIM' : 'NÃO'}\n`;
+      log += `⏰ Delay: ${tempoMin}s - ${tempoMax}s\n`;
+      log += `📡 Instâncias: ${instanciasSelecionadas.join(', ')}\n\n`;
+
+      for (let i = 0; i < numeros.length; i++) {
+        const instanciaSorteada = sortearInstancia(instanciasSelecionadas);
+        const destino = numeros[i];
+        const isGroup = destino.includes('@g.us');
+        
+        for (let j = 0; j < mensagensValidas.length; j++) {
+          contador++;
+          
+          try {
+            const resultado = await enviarMensagem(instanciaSorteada, destino, mensagensValidas[j], mencionarTodos);
+            sucessos++;
+            
+            const tipoDestino = isGroup ? '👥 GRUPO' : '👤 INDIVIDUAL';
+            const mencaoInfo = mencionarTodos && isGroup ? ' (🔥 @everyone)' : '';
+            
+            log += `✅ ${tipoDestino} | ${destino} | via ${instanciaSorteada} | Msg ${j+1}${mencaoInfo} | Status: Enviado\n`;
+            
+          } catch (error) {
+            erros++;
+            const tipoDestino = isGroup ? '👥 GRUPO' : '👤 INDIVIDUAL';
+            log += `❌ ${tipoDestino} | ${destino} | via ${instanciaSorteada} | Msg ${j+1} | Erro: ${error.message}\n`;
+          }
+
+          const pct = Math.floor((contador / total) * 100);
+          const tipoAtual = numeros[i].includes('@g.us') ? '👥' : '👤';
+          status.innerText = `${tipoAtual} Enviando ${contador}/${total} (${pct}%) | ✅${sucessos} ❌${erros}`;
+          progressBar.style.width = `${pct}%`;
+          progressBar.innerText = `${pct}%`;
+          
+          // Delay apenas se não for a última mensagem
+          if (contador < total) {
+            await new Promise(resolve => setTimeout(resolve, gerarDelayAleatorio(tempoMin, tempoMax)));
+          }
+        }
+      }
+
+      // Status final
+      const taxaSucesso = Math.round((sucessos / (sucessos + erros)) * 100);
+      status.innerHTML = `
+        ✅ Disparos concluídos!<br>
+        📊 ${sucessos} sucessos | ${erros} erros | ${taxaSucesso}% taxa de sucesso
+        ${mencionarTodos ? '<br>🔥 Modo "Mencionar Todos" usado' : ''}
+      `;
+      
+      // Adicionar resumo ao log
+      log += `\n📊 RESUMO FINAL:\n`;
+      log += `✅ Sucessos: ${sucessos}\n`;
+      log += `❌ Erros: ${erros}\n`;
+      log += `📈 Taxa de sucesso: ${taxaSucesso}%\n`;
+      log += `⏱️ Finalizado em: ${new Date().toLocaleString()}\n`;
+      
+      // Download do log
+      const blob = new Blob([log], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `log-disparos${mencionarTodos ? '-mention-all' : ''}-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
+      a.click();
+    });
+
+    // Inicialização
+    window.onload = async () => {
+      debugLog('🚀 Iniciando aplicação...');
+      
+      // Carregar configuração
+      const config = carregarConfiguracaoSalva();
+      
+      if (config) {
+        debugLog('📋 Configuração encontrada, verificando conexão...');
+        
+        // Verificar conexão
+        const conectado = await verificarConexaoEvolution();
+        
+        if (conectado) {
+          debugLog('✅ Conectado, carregando instâncias...');
+          await carregarInstancias();
+        } else {
+          debugLog('❌ Falha na conexão');
+        }
+      } else {
+        debugLog('⚠️ Nenhuma configuração encontrada');
+      }
+    };
+
+    // Funções globais
+    window.buscarGrupos = buscarGrupos;
+    window.extrairParticipantesGrupo = extrairParticipantesGrupo;
+  </script>
+</body>
+</html>

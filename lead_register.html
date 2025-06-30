@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro - TASK AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Estilos básicos do tema escuro */
+    :root {
+      --bg-primary: #0d1117;
+      --bg-card: #161b22;
+      --border-color: #30363d;
+      --text-color: #e6edf3;
+      --accent: #00ffae;
+      --btn-bg: #00b86b;
+      --btn-hover: #00ffae;
+      --input-bg: #0d1117;
+      --input-border: #2ea043;
+      --placeholder-color: #8b949e;
+      --success-color: #238636;
+      --danger-color: #da3633;
+      --warning-color: #d29922;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 255, 174, 0.07);
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .form-control {
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+    }
+
+    .form-control::placeholder {
+      color: var(--placeholder-color);
+    }
+
+    .form-control:focus {
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 0.2rem rgba(0, 255, 174, 0.25);
+    }
+
+    .btn-primary {
+      background-color: var(--btn-hover);
+      border-color: var(--btn-hover);
+      transition: all 0.3s ease;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--btn-hover);
+      filter: brightness(1.1);
+    }
+
+    .alert {
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
+    .alert-danger {
+        background-color: rgba(218, 54, 51, 0.1);
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+    }
+    
+    .alert-success {
+        background-color: rgba(35, 134, 54, 0.1);
+        border-color: var(--success-color);
+        color: var(--success-color);
+    }
+
+    .alert-warning {
+        background-color: rgba(210, 153, 34, 0.1);
+        border-color: var(--warning-color);
+        color: var(--warning-color);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--btn-hover);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card shadow-lg p-4 mx-auto" style="max-width: 450px;">
+      <div class="text-center mb-4">
+        <img src="https://i.imgur.com/ShEemN5.png" alt="Logo TASK AI" style="max-width: 100%; height: auto; max-height: 70px;">
+        <h4 class="mt-3">📝 Criar Conta TASK AI</h4>
+        <p class="text-muted">Preencha os dados para se cadastrar.</p>
+      </div>
+
+      <form id="registerForm">
+        <div class="mb-3">
+          <label for="leadName" class="form-label">Nome Completo</label>
+          <input type="text" class="form-control" id="leadName" placeholder="Digite seu nome completo" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="leadEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="leadEmail" placeholder="Digite seu email" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="leadPhone" class="form-label">WhatsApp (opcional)</label>
+          <input type="tel" class="form-control" id="leadPhone" placeholder="(11) 98765-4321">
+        </div>
+
+        <div class="mb-3">
+          <label for="leadPassword" class="form-label">Senha</label>
+          <input type="password" class="form-control" id="leadPassword" placeholder="Crie uma senha forte" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="leadPasswordConfirm" class="form-label">Confirmar Senha</label>
+          <input type="password" class="form-control" id="leadPasswordConfirm" placeholder="Digite a senha novamente" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Criar Conta</button>
+      </form>
+
+      <div id="message" class="alert" style="display: none;"></div>
+
+      <div class="text-center mt-3">
+        <small class="text-muted">Já tem uma conta? <a href="lead_login.html">Fazer login</a></small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- CONFIGURAÇÃO DO SEU BACKEND ---
+    const BACKEND_BASE_URL = "http://127.0.0.1:5000/api/lead";
+    // -----------------------------------
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const leadName = document.getElementById('leadName').value.trim();
+      const leadEmail = document.getElementById('leadEmail').value.trim();
+      const leadPhone = document.getElementById('leadPhone').value.trim();
+      const leadPassword = document.getElementById('leadPassword').value;
+      const leadPasswordConfirm = document.getElementById('leadPasswordConfirm').value;
+      const messageDiv = document.getElementById('message');
+
+      messageDiv.style.display = 'none';
+      messageDiv.className = 'alert';
+
+      // Validações
+      if (!leadName || !leadEmail || !leadPassword) {
+        messageDiv.innerText = 'Por favor, preencha todos os campos obrigatórios.';
+        messageDiv.classList.add('alert-warning');
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      if (leadPassword !== leadPasswordConfirm) {
+        messageDiv.innerText = 'As senhas não coincidem.';
+        messageDiv.classList.add('alert-danger');
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      if (leadPassword.length < 6) {
+        messageDiv.innerText = 'A senha deve ter pelo menos 6 caracteres.';
+        messageDiv.classList.add('alert-warning');
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      try {
+        const registerUrl = `${BACKEND_BASE_URL}/register`;
+        const response = await fetch(registerUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            name: leadName, 
+            email: leadEmail, 
+            phone: leadPhone || null,
+            password: leadPassword 
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          messageDiv.innerText = 'Cadastro realizado com sucesso! Aguarde aprovação do administrador.';
+          messageDiv.classList.add('alert-success');
+          messageDiv.style.display = 'block';
+          
+          // Limpa o formulário
+          document.getElementById('registerForm').reset();
+          
+          // Redireciona para login após 3 segundos
+          setTimeout(() => {
+            window.location.href = 'lead_login.html';
+          }, 3000);
+        } else {
+          const errorMessage = result.error || 'Erro ao criar conta.';
+          messageDiv.innerText = errorMessage;
+          messageDiv.classList.add('alert-danger');
+          messageDiv.style.display = 'block';
+        }
+
+      } catch (error) {
+        console.error("Erro na requisição de registro:", error);
+        messageDiv.innerText = `Erro de comunicação: ${error.message}`;
+        messageDiv.classList.add('alert-danger');
+        messageDiv.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

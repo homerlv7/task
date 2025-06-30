@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Conexão Evolution API - TASK AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0d1117;
+      --bg-card: #161b22;
+      --border-color: #30363d;
+      --text-color: #e6edf3;
+      --accent: #00ffae;
+      --btn-bg: #00b86b;
+      --btn-hover: #00ffae;
+      --input-bg: #0d1117;
+      --input-border: #2ea043;
+      --placeholder-color: #8b949e;
+      --success-color: #238636;
+      --warning-color: #d29922;
+      --danger-color: #da3633;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 255, 174, 0.07);
+    }
+
+    img {
+      filter: drop-shadow(0px 0px 8px rgba(0, 255, 174, 0.4));
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .form-control,
+    .form-select {
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+    }
+
+    .form-control::placeholder {
+      color: var(--placeholder-color);
+    }
+
+    .btn-primary {
+      background-color: var(--btn-hover);
+      border-color: var(--btn-hover);
+      transition: all 0.3s ease;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--btn-hover);
+      filter: brightness(1.1);
+    }
+
+    .btn-success {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+      color: white;
+      font-weight: bold;
+    }
+
+    .btn-warning {
+      background-color: var(--warning-color);
+      border-color: var(--warning-color);
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      border-color: var(--danger-color);
+      color: white;
+      font-weight: bold;
+    }
+
+    .qr-container {
+      background-color: white;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      margin: 20px 0;
+      border: 3px solid var(--accent);
+    }
+
+    .qr-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .status-card {
+      border-radius: 12px;
+      padding: 15px;
+      margin: 10px 0;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .status-disconnected {
+      background-color: rgba(218, 54, 51, 0.1);
+      border: 1px solid var(--danger-color);
+      color: var(--danger-color);
+    }
+
+    .status-connecting {
+      background-color: rgba(210, 153, 34, 0.1);
+      border: 1px solid var(--warning-color);
+      color: var(--warning-color);
+    }
+
+    .status-connected {
+      background-color: rgba(35, 134, 54, 0.1);
+      border: 1px solid var(--success-color);
+      color: var(--success-color);
+    }
+
+    .instance-info {
+      background-color: rgba(0, 255, 174, 0.05);
+      border: 1px solid rgba(0, 255, 174, 0.2);
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+    }
+
+    .instance-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .instance-item {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+
+    .instance-item:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(0, 255, 174, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .log-container {
+      background-color: #000;
+      color: #00ff00;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin: 15px 0;
+    }
+
+    .btn-outline-secondary {
+      border-color: #6c757d;
+      color: #6c757d;
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .alert-danger .btn {
+      margin-top: 5px;
+    }
+
+    .debug-info {
+      background-color: rgba(108, 117, 125, 0.1);
+      border: 1px solid rgba(108, 117, 125, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      font-family: monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="card shadow-lg p-4 mx-auto" style="max-width: 900px;">
+      <div class="text-center mb-4">
+        <img src="https://i.imgur.com/ShEemN5.png" alt="Logo TASK AI" style="max-width: 100%; height: auto; max-height: 80px;">
+        <h2 class="mt-3">🔗 Conexão Evolution API</h2>
+      </div>
+
+      <!-- CONFIGURAÇÃO DA API -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label for="urlEvolution" class="form-label">URL da Evolution API</label>
+          <input type="text" class="form-control" id="urlEvolution" placeholder="https://sua-evolution-api.com" value="http://localhost:8080">
+        </div>
+        <div class="col-md-6">
+          <label for="apiKey" class="form-label">API Key Global</label>
+          <input type="text" class="form-control" id="apiKey" placeholder="Sua chave de API">
+        </div>
+      </div>
+
+      <!-- AÇÕES PRINCIPAIS -->
+      <div class="d-flex gap-2 mb-4 flex-wrap">
+        <button class="btn btn-primary" id="listarInstanciasBtn">📋 Listar Instâncias</button>
+        <button class="btn btn-success" id="criarInstanciaBtn">➕ Criar Nova Instância</button>
+        <button class="btn btn-warning" id="irDisparadorBtn" style="display: none;">🚀 Ir para Disparador</button>
+        <button class="btn btn-outline-light" onclick="window.open('disparador.html', '_blank')">📤 Abrir Disparador</button>
+        <button class="btn btn-outline-secondary" id="toggleDebugBtn">🔧 Debug</button>
+      </div>
+
+      <!-- CRIAR NOVA INSTÂNCIA -->
+      <div id="criarInstanciaSection" style="display: none;" class="mb-4">
+        <div class="card p-3">
+          <h5>➕ Criar Nova Instância</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="nomeInstancia" class="form-label">Nome da Instância</label>
+              <input type="text" class="form-control" id="nomeInstancia" placeholder="Ex: minha-instancia">
+            </div>
+            <div class="col-md-6">
+              <label for="tokenInstancia" class="form-label">Token (opcional)</label>
+              <input type="text" class="form-control" id="tokenInstancia" placeholder="Deixe em branco para gerar automaticamente">
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary" id="confirmarCriarBtn">✅ Criar Instância</button>
+            <button class="btn btn-outline-light" id="cancelarCriarBtn">❌ Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÁREA DE DEBUG -->
+      <div id="debugSection" style="display: none;" class="mb-4">
+        <div class="card p-3">
+          <h5>🔧 Debug da API</h5>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-sm btn-info" id="testarEndpointsBtn">🧪 Testar Endpoints</button>
+            <button class="btn btn-sm btn-secondary" id="forcarQrBtn">🔄 Forçar QR Code</button>
+            <button class="btn btn-sm btn-warning" id="reiniciarInstanciaBtn">♻️ Reiniciar Instância</button>
+            <button class="btn btn-sm btn-success" onclick="testarSelecaoInstancia()">🎯 Testar Seleção</button>
+            <button class="btn btn-sm btn-primary" onclick="verificarLocalStorage()">💾 Verificar Salvamento</button>
+          </div>
+          <div class="debug-info mt-3" id="debugInfo"></div>
+        </div>
+      </div>
+
+      <!-- ÁREA DE QR CODE -->
+      <div id="qrSection" style="display: none;">
+        <h5 class="text-center">📱 Escaneie o QR Code</h5>
+        <div class="qr-container" id="qrContainer">
+          <div class="loading"></div>
+          <p>Gerando QR Code...</p>
+        </div>
+        <div class="text-center">
+          <button class="btn btn-warning" id="atualizarQrBtn">🔄 Atualizar QR</button>
+          <button class="btn btn-danger" id="cancelarConexaoBtn">❌ Cancelar Conexão</button>
+          <button class="btn btn-info btn-sm" onclick="forcarQrCode()">🔧 Forçar QR</button>
+        </div>
+      </div>
+
+      <!-- STATUS DA CONEXÃO -->
+      <div id="statusSection" style="display: none;">
+        <div class="status-card" id="statusCard">
+          <div class="loading"></div>
+          Verificando status da conexão...
+        </div>
+      </div>
+
+      <!-- INFORMAÇÕES DA INSTÂNCIA CONECTADA -->
+      <div id="instanceInfoSection" style="display: none;">
+        <div class="instance-info">
+          <h6>✅ Instância Conectada</h6>
+          <div id="instanceDetails"></div>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-success" id="usarInstanciaBtn">🎯 Usar esta Instância</button>
+            <button class="btn btn-outline-light" id="desconectarBtn">🔌 Desconectar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA DE INSTÂNCIAS -->
+      <div id="instanciasSection" style="display: none;">
+        <h5>📋 Instâncias Disponíveis</h5>
+        <div class="instance-list" id="instancesList"></div>
+      </div>
+
+      <!-- LOG DE ATIVIDADES -->
+      <div class="log-container" id="logContainer">
+        <div>🔄 Sistema iniciado. Aguardando ações...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variáveis globais
+    let currentInstance = null;
+    let connectionCheckInterval = null;
+    let qrCheckInterval = null;
+
+    // Funções de utilidade
+    function log(message) {
+      const logContainer = document.getElementById('logContainer');
+      const timestamp = new Date().toLocaleTimeString();
+      logContainer.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    function getApiConfig() {
+      const url = document.getElementById('urlEvolution').value.trim();
+      const apiKey = document.getElementById('apiKey').value.trim();
+      
+      if (!url || !apiKey) {
+        alert('Por favor, preencha a URL da Evolution API e a API Key');
+        return null;
+      }
+      
+      return { url, apiKey };
+    }
+
+    // Listar instâncias existentes
+    async function listarInstancias() {
+      const config = getApiConfig();
+      if (!config) return;
+
+      try {
+        log('🔍 Buscando instâncias...');
+        
+        // Mostrar loading na lista
+        const container = document.getElementById('instancesList');
+        const section = document.getElementById('instanciasSection');
+        container.innerHTML = '<div class="text-center p-3"><div class="loading"></div><p>Carregando instâncias...</p></div>';
+        section.style.display = 'block';
+        
+        const response = await fetch(`${config.url}/instance/fetchInstances`, {
+          headers: { 'apikey': config.apiKey }
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const instances = await response.json();
+        log(`✅ Encontradas ${instances.length} instâncias`);
+        
+        // Validar se a resposta é um array
+        if (!Array.isArray(instances)) {
+          throw new Error('Resposta da API não é um array válido');
+        }
+        
+        mostrarListaInstancias(instances);
+        
+        // Log detalhado das instâncias
+        instances.forEach(inst => {
+          log(`📱 ${inst.name} - Status: ${inst.connectionStatus} - Owner: ${inst.owner || 'N/A'}`);
+        });
+        
+      } catch (error) {
+        log(`❌ Erro ao listar instâncias: ${error.message}`);
+        
+        const container = document.getElementById('instancesList');
+        container.innerHTML = `
+          <div class="alert alert-danger">
+            <strong>❌ Erro ao carregar instâncias:</strong><br>
+            ${error.message}<br><br>
+            <strong>Possíveis soluções:</strong><br>
+            • Verifique se a URL da API está correta<br>
+            • Confirme se a API Key é válida<br>
+            • Teste a conectividade com a Evolution API<br>
+            <button class="btn btn-sm btn-primary mt-2" onclick="listarInstancias()">🔄 Tentar Novamente</button>
+          </div>
+        `;
+        
+        alert(`Erro ao conectar com a API:\n\n${error.message}\n\nVerifique:\n• URL da API\n• API Key\n• Conectividade de rede`);
+      }
+    }
+
+    function mostrarListaInstancias(instances) {
+      const container = document.getElementById('instancesList');
+      const section = document.getElementById('instanciasSection');
+      
+      if (instances.length === 0) {
+        container.innerHTML = '<p class="text-center">Nenhuma instância encontrada</p>';
+      } else {
+        container.innerHTML = instances.map((inst, index) => {
+          const statusBadge = getStatusBadge(inst.connectionStatus);
+          const isConnected = inst.connectionStatus === 'open';
+          
+          return `
+            <div class="instance-item" data-instance-name="${inst.name}" data-instance-owner="${inst.owner || ''}">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6>${inst.name}</h6>
+                  <small class="text-muted">Status: ${statusBadge}</small>
+                  ${inst.owner ? `<br><small class="text-muted">Número: ${inst.owner}</small>` : ''}
+                </div>
+                <div class="d-flex gap-2">
+                  ${!isConnected ? 
+                    `<button class="btn btn-primary btn-sm btn-conectar" data-instance="${inst.name}">🔗 Conectar</button>` :
+                    `<button class="btn btn-success btn-sm btn-selecionar" data-instance="${inst.name}" data-owner="${inst.owner || ''}">✅ Selecionar</button>`
+                  }
+                  <button class="btn btn-warning btn-sm btn-reiniciar" data-instance="${inst.name}">🔄 Reiniciar</button>
+                  <button class="btn btn-danger btn-sm btn-deletar" data-instance="${inst.name}">🗑️ Deletar</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+        // Adicionar event listeners após criar os elementos
+        adicionarEventListenersInstancias();
+      }
+      
+      section.style.display = 'block';
+    }
+
+    // Adicionar event listeners para os botões das instâncias
+    function adicionarEventListenersInstancias() {
+      // Botões de selecionar - CORRIGIDO: chamar diretamente selecionarInstancia
+      document.querySelectorAll('.btn-selecionar').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const instanceName = this.dataset.instance;
+          const owner = this.dataset.owner || '';
+          console.log('🎯 Botão selecionar clicado:', instanceName, owner);
+          selecionarInstancia(instanceName, owner);
+        });
+      });
+
+      // Botões de conectar
+      document.querySelectorAll('.btn-conectar').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const instanceName = this.dataset.instance;
+          console.log('🔗 Botão conectar clicado:', instanceName);
+          conectarInstancia(instanceName);
+        });
+      });
+
+      // Botões de reiniciar
+      document.querySelectorAll('.btn-reiniciar').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const instanceName = this.dataset.instance;
+          console.log('🔄 Botão reiniciar clicado:', instanceName);
+          reiniciarInstancia(instanceName);
+        });
+      });
+
+      // Botões de deletar
+      document.querySelectorAll('.btn-deletar').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const instanceName = this.dataset.instance;
+          console.log('🗑️ Botão deletar clicado:', instanceName);
+          deletarInstancia(instanceName);
+        });
+      });
+    }
+
+    function getStatusBadge(status) {
+      const badges = {
+        'open': '<span class="badge bg-success">Conectado</span>',
+        'close': '<span class="badge bg-danger">Desconectado</span>',
+        'connecting': '<span class="badge bg-warning">Conectando</span>'
+      };
+      return badges[status] || '<span class="badge bg-secondary">Desconhecido</span>';
+    }
+
+    // Função de seleção de instância CORRIGIDA
+    function selecionarInstancia(instanceName, owner = '') {
+      try {
+        console.log(`✅ Iniciando seleção da instância: "${instanceName}"`);
+        console.log(`📱 Owner recebido: "${owner}"`);
+        
+        if (!instanceName || instanceName.trim() === '') {
+          throw new Error('Nome da instância inválido');
+        }
+        
+        currentInstance = instanceName.trim();
+        
+        // Obter configuração atual
+        const config = getApiConfig();
+        if (!config) {
+          alert('❌ Configure a URL e API Key primeiro!');
+          return;
+        }
+        
+        // Criar configuração completa para salvar
+        const evolutionConfig = {
+          url: config.url,
+          apiKey: config.apiKey,
+          instance: currentInstance,
+          owner: owner,
+          selectedAt: new Date().toISOString(),
+          status: 'connected',
+          savedFrom: 'conexao_page'
+        };
+        
+        // Salvar no localStorage IMEDIATAMENTE
+        localStorage.setItem('evolutionConfig', JSON.stringify(evolutionConfig));
+        console.log('💾 Configuração salva:', evolutionConfig);
+        
+        // Verificar se foi salvo corretamente
+        const verificacao = localStorage.getItem('evolutionConfig');
+        const configVerificada = JSON.parse(verificacao);
+        console.log('🔍 Verificação da configuração salva:', configVerificada);
+        
+        if (configVerificada.instance !== currentInstance) {
+          throw new Error('Erro ao salvar configuração');
+        }
+        
+        // Mostrar seção de instância conectada
+        document.getElementById('instanceInfoSection').style.display = 'block';
+        document.getElementById('qrSection').style.display = 'none';
+        document.getElementById('statusSection').style.display = 'none';
+        
+        // Atualizar detalhes da instância
+        const details = document.getElementById('instanceDetails');
+        const ownerText = owner && owner.trim() !== '' ? owner : 'Não disponível';
+        
+        details.innerHTML = `
+          <p><strong>Nome:</strong> ${instanceName}</p>
+          <p><strong>Status:</strong> ${getStatusBadge('open')}</p>
+          <p><strong>Número:</strong> ${ownerText}</p>
+          <p><strong>Selecionada em:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Salva no localStorage:</strong> ✅ Sim</p>
+        `;
+        
+        // Mostrar botão para ir ao disparador
+        document.getElementById('irDisparadorBtn').style.display = 'inline-block';
+        
+        // Log de sucesso
+        log(`💾 Configuração salva automaticamente para instância: ${currentInstance}`);
+        log(`🔗 URL: ${config.url}`);
+        log(`🔑 API Key: ${config.apiKey.substring(0, 10)}...`);
+        log(`📱 Instância: ${currentInstance}`);
+        log(`💾 Dados salvos no localStorage com sucesso!`);
+        
+        // Mostrar confirmação detalhada
+        alert(`✅ INSTÂNCIA SELECIONADA COM SUCESSO!\n\n📱 Instância: ${currentInstance}\n🔗 URL: ${config.url}\n🔑 API Key: ${config.apiKey.substring(0, 10)}...\n👤 Owner: ${ownerText}\n\n💾 Configuração salva no navegador!\n🚀 Pronta para usar no Disparador!\n\n💡 Dica: Use "🚀 Ir para Disparador" ou abra o Disparador em nova aba.`);
+        
+      } catch (error) {
+        console.error('❌ Erro na seleção da instância:', error);
+        alert(`❌ Erro ao selecionar instância:\n\n${error.message}`);
+        log(`❌ Erro na seleção: ${error.message}`);
+      }
+    }
+
+    // Criar nova instância
+    async function criarInstancia() {
+      const config = getApiConfig();
+      if (!config) return;
+
+      const nome = document.getElementById('nomeInstancia').value.trim();
+      const token = document.getElementById('tokenInstancia').value.trim();
+
+      if (!nome) {
+        alert('Digite um nome para a instância');
+        return;
+      }
+
+      try {
+        log(`🔨 Criando instância: ${nome}`);
+        
+        const payload = {
+          instanceName: nome,
+          qrcode: true,
+          integration: "WHATSAPP-BAILEYS"
+        };
+        
+        if (token) payload.token = token;
+
+        const response = await fetch(`${config.url}/instance/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': config.apiKey
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const result = await response.json();
+        log(`✅ Instância criada: ${nome}`);
+        
+        currentInstance = nome;
+        document.getElementById('criarInstanciaSection').style.display = 'none';
+        
+        // Conectar automaticamente
+        conectarInstancia(nome);
+        
+      } catch (error) {
+        log(`❌ Erro ao criar instância: ${error.message}`);
+        alert('Erro ao criar instância. Verifique os dados.');
+      }
+    }
+
+    // Conectar instância (mostrar QR)
+    async function conectarInstancia(instanceName) {
+      const config = getApiConfig();
+      if (!config) return;
+
+      try {
+        log(`🔗 Iniciando conexão da instância: ${instanceName}`);
+        currentInstance = instanceName;
+        
+        // Mostrar seção do QR
+        document.getElementById('qrSection').style.display = 'block';
+        document.getElementById('statusSection').style.display = 'block';
+        
+        // Primeiro, tentar iniciar a conexão
+        try {
+          const connectResponse = await fetch(`${config.url}/instance/restart/${instanceName}`, {
+            method: 'PUT',
+            headers: { 'apikey': config.apiKey }
+          });
+          
+          if (connectResponse.ok) {
+            log('🔄 Instância reiniciada com sucesso');
+          } else {
+            log('⚠️ Falha ao reiniciar, tentando conectar diretamente');
+          }
+        } catch (err) {
+          log('⚠️ Restart não disponível, continuando...');
+        }
+        
+        // Aguardar um pouco antes de buscar o QR
+        setTimeout(async () => {
+          await buscarQrCode();
+          iniciarVerificacaoStatus();
+        }, 2000);
+        
+      } catch (error) {
+        log(`❌ Erro ao conectar: ${error.message}`);
+      }
+    }
+
+    // Buscar QR Code
+    async function buscarQrCode() {
+      const config = getApiConfig();
+      if (!config) return;
+
+      try {
+        log('🔄 Tentando obter QR Code...');
+        
+        // Primeira tentativa: endpoint connect
+        let response = await fetch(`${config.url}/instance/connect/${currentInstance}`, {
+          headers: { 'apikey': config.apiKey }
+        });
+
+        let result;
+        if (response.ok) {
+          result = await response.json();
+          log('📡 Resposta do connect:', JSON.stringify(result));
+        } else {
+          log(`⚠️ Connect falhou: ${response.status}`);
+          
+          // Segunda tentativa: endpoint qrcode
+          response = await fetch(`${config.url}/instance/qrcode/${currentInstance}`, {
+            headers: { 'apikey': config.apiKey }
+          });
+          
+          if (response.ok) {
+            result = await response.json();
+            log('📡 Resposta do qrcode:', JSON.stringify(result));
+          } else {
+            throw new Error(`Ambos endpoints falharam: ${response.status}`);
+          }
+        }
+        
+        // Verificar diferentes estruturas de resposta
+        let qrBase64 = null;
+        
+        if (result.base64) {
+          qrBase64 = result.base64;
+        } else if (result.qrcode && result.qrcode.base64) {
+          qrBase64 = result.qrcode.base64;
+        } else if (result.qr) {
+          qrBase64 = result.qr;
+        } else if (result.qrCode) {
+          qrBase64 = result.qrCode;
+        } else if (typeof result === 'string' && result.startsWith('data:image')) {
+          qrBase64 = result.split(',')[1];
+        }
+        
+        if (qrBase64) {
+          // Remover prefixo data:image se existir
+          const cleanBase64 = qrBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+          
+          document.getElementById('qrContainer').innerHTML = `
+            <img src="data:image/png;base64,${cleanBase64}" alt="QR Code" style="max-width: 280px;">
+            <p class="mt-2">Escaneie com seu WhatsApp</p>
+          `;
+          log('✅ QR Code exibido com sucesso');
+        } else {
+          log('❌ QR Code não encontrado na resposta');
+          document.getElementById('qrContainer').innerHTML = `
+            <div class="alert alert-warning">
+              <strong>QR não encontrado!</strong><br>
+              Resposta da API: <code>${JSON.stringify(result)}</code><br>
+              <button class="btn btn-sm btn-primary mt-2" onclick="buscarQrCode()">🔄 Tentar Novamente</button>
+            </div>
+          `;
+        }
+        
+      } catch (error) {
+        log(`❌ Erro ao buscar QR: ${error.message}`);
+        document.getElementById('qrContainer').innerHTML = `
+          <div class="alert alert-danger">
+            <strong>Erro ao obter QR Code!</strong><br>
+            ${error.message}<br>
+            <button class="btn btn-sm btn-primary mt-2" onclick="buscarQrCode()">🔄 Tentar Novamente</button>
+          </div>
+        `;
+      }
+    }
+
+    // Verificar status da conexão
+    async function verificarStatus() {
+      const config = getApiConfig();
+      if (!config || !currentInstance) return;
+
+      try {
+        // Tentar diferentes endpoints de status
+        let response = await fetch(`${config.url}/instance/connectionState/${currentInstance}`, {
+          headers: { 'apikey': config.apiKey }
+        });
+
+        let result;
+        if (!response.ok) {
+          // Tentar endpoint alternativo
+          response = await fetch(`${config.url}/instance/fetchInstances`, {
+            headers: { 'apikey': config.apiKey }
+          });
+          
+          if (response.ok) {
+            const instances = await response.json();
+            const currentInst = instances.find(inst => inst.name === currentInstance);
+            if (currentInst) {
+              result = {
+                instance: {
+                  state: currentInst.connectionStatus,
+                  instanceName: currentInst.name,
+                  owner: currentInst.owner || currentInst.profilePictureUrl || 'Carregando...'
+                }
+              };
+            }
+          }
+        } else {
+          result = await response.json();
+        }
+        
+        if (!result) {
+          log('⚠️ Não foi possível verificar o status');
+          return;
+        }
+        
+        const status = result.instance?.state || result.instance?.connectionStatus || 'disconnected';
+        log(`📊 Status atual: ${status}`);
+        
+        atualizarStatusDisplay(status, result.instance);
+        
+        if (status === 'open') {
+          pararVerificacaoStatus();
+          mostrarInstanciaConectada(result.instance);
+        } else if (status === 'close' || status === 'connecting') {
+          // Se desconectado, tentar obter novo QR
+          if (status === 'close') {
+            log('🔄 Instância desconectada, obtendo novo QR...');
+            setTimeout(buscarQrCode, 1000);
+          }
+        }
+        
+      } catch (error) {
+        log(`❌ Erro ao verificar status: ${error.message}`);
+      }
+    }
+
+    function atualizarStatusDisplay(status, instanceData) {
+      const statusCard = document.getElementById('statusCard');
+      
+      statusCard.className = 'status-card';
+      
+      switch (status) {
+        case 'open':
+          statusCard.classList.add('status-connected');
+          statusCard.innerHTML = '✅ Conectado com sucesso!';
+          break;
+        case 'connecting':
+          statusCard.classList.add('status-connecting');
+          statusCard.innerHTML = '⏳ Conectando...';
+          break;
+        default:
+          statusCard.classList.add('status-disconnected');
+          statusCard.innerHTML = '🔄 Aguardando conexão...';
+      }
+    }
+
+    function mostrarInstanciaConectada(instanceData) {
+      document.getElementById('qrSection').style.display = 'none';
+      document.getElementById('instanceInfoSection').style.display = 'block';
+      
+      const details = document.getElementById('instanceDetails');
+      details.innerHTML = `
+        <p><strong>Nome:</strong> ${instanceData.instanceName}</p>
+        <p><strong>Status:</strong> ${getStatusBadge('open')}</p>
+        <p><strong>Número:</strong> ${instanceData.owner || 'Carregando...'}</p>
+        <p><strong>Conectado em:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>Estado:</strong> ${instanceData.state || 'Ativo'}</p>
+      `;
+      
+      document.getElementById('irDisparadorBtn').style.display = 'inline-block';
+      
+      // Salvar configuração automaticamente quando conectar
+      const config = getApiConfig();
+      if (config) {
+        const savedConfig = {
+          url: config.url,
+          apiKey: config.apiKey,
+          instance: instanceData.instanceName,
+          owner: instanceData.owner,
+          connectedAt: new Date().toISOString(),
+          state: instanceData.state,
+          savedFrom: 'conexao_page'
+        };
+        
+        localStorage.setItem('evolutionConfig', JSON.stringify(savedConfig));
+        log(`💾 Configuração salva automaticamente: ${instanceData.instanceName}`);
+      }
+      
+      log(`✅ Instância ${instanceData.instanceName} conectada com sucesso!`);
+    }
+
+    // Controle de intervalos
+    let statusCheckCount = 0;
+    const maxStatusChecks = 60; // 3 minutos máximo
+    
+    function iniciarVerificacaoStatus() {
+      pararVerificacaoStatus();
+      statusCheckCount = 0;
+      connectionCheckInterval = setInterval(() => {
+        statusCheckCount++;
+        if (statusCheckCount > maxStatusChecks) {
+          pararVerificacaoStatus();
+          log('⏰ Timeout na verificação de status. Tente conectar novamente.');
+          return;
+        }
+        verificarStatus();
+      }, 3000);
+    }
+
+    function pararVerificacaoStatus() {
+      if (connectionCheckInterval) {
+        clearInterval(connectionCheckInterval);
+        connectionCheckInterval = null;
+      }
+      statusCheckCount = 0;
+    }
+
+    // Reiniciar instância
+    async function reiniciarInstancia(instanceName) {
+      const config = getApiConfig();
+      if (!config) return;
+
+      try {
+        log(`♻️ Reiniciando instância: ${instanceName}`);
+        
+        const response = await fetch(`${config.url}/instance/restart/${instanceName}`, {
+          method: 'PUT',
+          headers: { 'apikey': config.apiKey }
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        log(`✅ Instância ${instanceName} reiniciada`);
+        alert(`✅ Instância ${instanceName} reiniciada com sucesso!`);
+        
+        // Recarregar lista
+        setTimeout(() => listarInstancias(), 2000);
+        
+      } catch (error) {
+        log(`❌ Erro ao reiniciar instância: ${error.message}`);
+        alert(`❌ Erro ao reiniciar instância: ${error.message}`);
+      }
+    }
+
+    // Deletar instância
+    async function deletarInstancia(instanceName) {
+      if (!confirm(`Tem certeza que deseja deletar a instância "${instanceName}"?`)) return;
+      
+      const config = getApiConfig();
+      if (!config) return;
+
+      try {
+        const response = await fetch(`${config.url}/instance/delete/${instanceName}`, {
+          method: 'DELETE',
+          headers: { 'apikey': config.apiKey }
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        log(`🗑️ Instância ${instanceName} deletada`);
+        listarInstancias(); // Atualizar lista
+        
+      } catch (error) {
+        log(`❌ Erro ao deletar instância: ${error.message}`);
+      }
+    }
+
+    // Ir para o disparador
+    function irParaDisparador() {
+      const config = getApiConfig();
+      if (!config || !currentInstance) {
+        alert('❌ Nenhuma instância selecionada!\n\nSelecione uma instância conectada primeiro.');
+        return;
+      }
+
+      // Criar configuração completa
+      const savedConfig = {
+        url: config.url,
+        apiKey: config.apiKey,
+        instance: currentInstance,
+        savedAt: new Date().toISOString(),
+        savedFrom: 'conexao_page'
+      };
+      
+      // Salvar no localStorage
+      localStorage.setItem('evolutionConfig', JSON.stringify(savedConfig));
+      
+      // Verificar se foi salvo corretamente
+      const verificacao = localStorage.getItem('evolutionConfig');
+      const configVerificada = JSON.parse(verificacao);
+      
+      if (configVerificada.instance !== currentInstance) {
+        alert('❌ Erro ao salvar configuração!\n\nTente novamente.');
+        return;
+      }
+
+      const opcao = confirm(`✅ CONFIGURAÇÃO COMPLETA!\n\n🔧 URL: ${config.url}\n🔑 API Key: ${config.apiKey.substring(0, 10)}...\n📱 Instância: ${currentInstance}\n\n💾 Configuração salva e verificada com sucesso!\n\nComo deseja prosseguir?\n\nOK = Abrir Disparador em nova aba\nCancelar = Ficar nesta página`);
+      
+      if (opcao) {
+        // Adicionar delay para garantir que o localStorage seja commitado
+        setTimeout(() => {
+          window.open('disparador.html', '_blank');
+        }, 100);
+      }
+      
+      log('💾 Configuração salva e verificada no navegador');
+    }
+
+    // Funções de debug
+    function testarSelecaoInstancia() {
+      const testInstance = prompt('Digite o nome da instância para testar:');
+      if (testInstance) {
+        selecionarInstancia(testInstance, 'test-owner');
+      }
+    }
+
+    function verificarLocalStorage() {
+      const saved = localStorage.getItem('evolutionConfig');
+      const debugInfo = document.getElementById('debugInfo');
+      
+      if (saved) {
+        const config = JSON.parse(saved);
+        debugInfo.innerHTML = `
+          <strong>Configuração Salva:</strong><br>
+          URL: ${config.url}<br>
+          API Key: ${config.apiKey ? config.apiKey.substring(0, 10) + '...' : 'Não definida'}<br>
+          Instância: ${config.instance || 'Não definida'}<br>
+          Owner: ${config.owner || 'Não definido'}<br>
+          Salvo em: ${config.savedAt || config.selectedAt || 'N/A'}<br>
+          Salvo de: ${config.savedFrom || 'N/A'}
+        `;
+      } else {
+        debugInfo.innerHTML = '<strong>Nenhuma configuração encontrada no localStorage</strong>';
+      }
+    }
+
+    async function testarEndpoints() {
+      const config = getApiConfig();
+      if (!config) return;
+      
+      const debugInfo = document.getElementById('debugInfo');
+      debugInfo.innerHTML = '<strong>Testando endpoints...</strong><br>';
+      
+      const endpoints = [
+        '/instance/fetchInstances',
+        '/instance/connectionState/' + (currentInstance || 'test'),
+        '/group/fetchAllGroups/' + (currentInstance || 'test')
+      ];
+      
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(`${config.url}${endpoint}`, {
+            headers: { 'apikey': config.apiKey }
+          });
+          debugInfo.innerHTML += `${endpoint}: ${response.status} ${response.statusText}<br>`;
+        } catch (error) {
+          debugInfo.innerHTML += `${endpoint}: ERRO - ${error.message}<br>`;
+        }
+      }
+    }
+
+    function forcarQrCode() {
+      if (currentInstance) {
+        buscarQrCode();
+      } else {
+        alert('Selecione uma instância primeiro!');
+      }
+    }
+
+    // Event Listeners
+    document.getElementById('listarInstanciasBtn').addEventListener('click', listarInstancias);
+    document.getElementById('criarInstanciaBtn').addEventListener('click', () => {
+      document.getElementById('criarInstanciaSection').style.display = 'block';
+    });
+    document.getElementById('confirmarCriarBtn').addEventListener('click', criarInstancia);
+    document.getElementById('cancelarCriarBtn').addEventListener('click', () => {
+      document.getElementById('criarInstanciaSection').style.display = 'none';
+    });
+    document.getElementById('atualizarQrBtn').addEventListener('click', buscarQrCode);
+    document.getElementById('cancelarConexaoBtn').addEventListener('click', () => {
+      pararVerificacaoStatus();
+      document.getElementById('qrSection').style.display = 'none';
+      document.getElementById('statusSection').style.display = 'none';
+      currentInstance = null;
+    });
+    document.getElementById('usarInstanciaBtn').addEventListener('click', irParaDisparador);
+    document.getElementById('irDisparadorBtn').addEventListener('click', irParaDisparador);
+    document.getElementById('desconectarBtn').addEventListener('click', async () => {
+      const config = getApiConfig();
+      if (!config || !currentInstance) return;
+      
+      try {
+        await fetch(`${config.url}/instance/logout/${currentInstance}`, {
+          method: 'DELETE',
+          headers: { 'apikey': config.apiKey }
+        });
+        log(`🔌 Instância ${currentInstance} desconectada`);
+        location.reload();
+      } catch (error) {
+        log(`❌ Erro ao desconectar: ${error.message}`);
+      }
+    });
+
+    // Event listeners para debug
+    document.getElementById('toggleDebugBtn').addEventListener('click', () => {
+      const debugSection = document.getElementById('debugSection');
+      debugSection.style.display = debugSection.style.display === 'none' ? 'block' : 'none';
+    });
+    document.getElementById('testarEndpointsBtn').addEventListener('click', testarEndpoints);
+    document.getElementById('forcarQrBtn').addEventListener('click', forcarQrCode);
+    document.getElementById('reiniciarInstanciaBtn').addEventListener('click', () => {
+      if (currentInstance) {
+        reiniciarInstancia(currentInstance);
+      } else {
+        alert('Selecione uma instância primeiro!');
+      }
+    });
+
+    // Funções globais para os botões inline
+    window.conectarInstancia = conectarInstancia;
+    window.deletarInstancia = deletarInstancia;
+    window.buscarQrCode = buscarQrCode;
+    window.reiniciarInstancia = reiniciarInstancia;
+    window.selecionarInstancia = selecionarInstancia;
+    window.testarSelecaoInstancia = testarSelecaoInstancia;
+    window.verificarLocalStorage = verificarLocalStorage;
+    window.forcarQrCode = forcarQrCode;
+
+    // Carregar configurações salvas
+    window.onload = () => {
+      const saved = localStorage.getItem('evolutionConfig');
+      if (saved) {
+        const config = JSON.parse(saved);
+        document.getElementById('urlEvolution').value = config.url;
+        document.getElementById('apiKey').value = config.apiKey;
+        log('🔄 Configurações carregadas do localStorage');
+        
+        // Se há configuração salva, listar instâncias automaticamente
+        setTimeout(() => {
+          listarInstancias();
+        }, 1000);
+      }
+    };
+  </script>
+</body>
+</html>
