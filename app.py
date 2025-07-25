@@ -5,7 +5,7 @@ import requests
 import json
 import sqlite3
 import urllib.parse
-from flask import Flask, request, jsonify, g
+from flask import Flask, render_template, request, jsonify, g
 from dotenv import load_dotenv
 from flask_cors import CORS
 import time
@@ -1688,6 +1688,52 @@ def admin_create_plan():
     except Exception as e:
         print(f"Erro ao criar plano: {e}")
         return jsonify({"error": "Erro ao criar plano."}), 500
+
+
+# --- Routes for HTML pages ---
+
+@app.route('/admin_panel.html')
+def admin_panel():
+    return render_template('admin_panel.html')
+
+@app.route('/cadastro.html')
+def cadastro():
+    return render_template('cadastro.html')
+
+@app.route('/conexao.html')
+def conexao():
+    return render_template('conexao.html')
+
+@app.route('/conexao_lead.html')
+def conexao_lead():
+    return render_template('conexao_lead.html')
+
+@app.route('/disparador.html')
+def disparador():
+    return render_template('disparador.html')
+
+@app.route('/disparador_lead.html')
+def disparador_lead():
+    return render_template('disparador_lead.html')
+
+@app.route('/lead_loguin.html')
+def lead_loguin():
+    return render_template('lead_loguin.html')
+
+@app.route('/lead_register.html')
+def lead_register():
+    return render_template('lead_register.html')
+
+@app.route('/login.html')
+def login():
+    return render_template('login.html')
+
+# --- Existing root route modification ---
+@app.route('/')
+def index():
+    return render_template('login.html')
+
+
 
 # Inicializa o banco de dados na primeira vez que a aplicação rodar
 # A checagem no @app.before_request já faz isso de forma automática.
