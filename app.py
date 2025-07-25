@@ -1298,10 +1298,11 @@ def extrair_participantes_lead(instance_name, group_jid):
      return jsonify({"error": f"Não foi possível extrair participantes para o grupo '{group_jid}'."}, 500)
 
 
-# --- Endpoint de Teste (Opcional) ---
+# --- Root route modification ---
 @app.route('/')
 def index():
-    return "Backend TASK AI rodando! Acesse /api/lead/conectar ou outros endpoints."
+    return render_template('login.html')
+
 
 # --- CONFIGURAÇÕES DE ADMINISTRAÇÃO ---
 ADMIN_TOKEN = "SEU_TOKEN_ADMIN_SUPER_SECRETO_AQUI_12345"  # MUDE ISSO EM PRODUÇÃO!
@@ -1693,44 +1694,39 @@ def admin_create_plan():
 # --- Routes for HTML pages ---
 
 @app.route('/admin_panel.html')
-def admin_panel():
+def serve_admin_panel():
     return render_template('admin_panel.html')
 
 @app.route('/cadastro.html')
-def cadastro():
+def serve_cadastro():
     return render_template('cadastro.html')
 
 @app.route('/conexao.html')
-def conexao():
+def serve_conexao():
     return render_template('conexao.html')
 
 @app.route('/conexao_lead.html')
-def conexao_lead():
+def serve_conexao_lead():
     return render_template('conexao_lead.html')
 
 @app.route('/disparador.html')
-def disparador():
+def serve_disparador():
     return render_template('disparador.html')
 
 @app.route('/disparador_lead.html')
-def disparador_lead():
+def serve_disparador_lead():
     return render_template('disparador_lead.html')
 
 @app.route('/lead_loguin.html')
-def lead_loguin():
+def serve_lead_loguin():
     return render_template('lead_loguin.html')
 
 @app.route('/lead_register.html')
-def lead_register():
+def serve_lead_register():
     return render_template('lead_register.html')
 
 @app.route('/login.html')
-def login():
-    return render_template('login.html')
-
-# --- Existing root route modification ---
-@app.route('/')
-def index():
+def serve_login():
     return render_template('login.html')
 
 
